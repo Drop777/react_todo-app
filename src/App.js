@@ -3,14 +3,13 @@ import Header from './Components/Header/Header';
 import Todoslist from './Components/Todoslist/Todoslist';
 import Footer from './Components/Footer/Footer';
 
-let id = 0;
-
 class App extends React.Component {
   state = {
     todo: '',
+    currentIndex: 0,
     todosList: [],
     filteredTodosList: [],
-    filterState: '',
+    filterField: 'all',
   };
 
   handleChange = ({ target }) => {
@@ -21,26 +20,27 @@ class App extends React.Component {
     });
   }
 
-  handleSubmit = (todo) => {
+  handleSubmit = (todo, currentIndex) => {
     if (todo) {
       const todoItem = {
         todoTitle: todo,
-        id,
+        id: currentIndex,
         completed: false,
       };
-
-      id += 1;
 
       this.setState(prevState => ({
         ...prevState,
         todo: '',
+        currentIndex: prevState.currentIndex + 1,
         todosList: [...prevState.todosList, todoItem],
         filteredTodosList: [...prevState.todosList, todoItem],
       }));
     }
   };
 
-  handleCheck = ({ target }, todoItem) => {
+  handleCheck = (
+    { target }, todoItem, filterField, showActiveTodos, showCompletedTodos
+  ) => {
     this.setState(prevState => ({
       todosList: prevState.todosList.map((todo) => {
         if (todo.id === todoItem.id) {
@@ -57,23 +57,29 @@ class App extends React.Component {
         return todo;
       }),
     }));
+
+    if (filterField === 'active') {
+      showActiveTodos();
+    } else if (filterField === 'completed') {
+      showCompletedTodos();
+    }
   }
 
-  handleDestroy = (todoItem) => {
+  handleRemove = (todoItem) => {
     this.setState(prevState => ({
       todosList: prevState.todosList.filter((todo) => {
         if (todo.id === todoItem.id) {
           return false;
         }
 
-        return todo;
+        return true;
       }),
       filteredTodosList: prevState.todosList.filter((todo) => {
         if (todo.id === todoItem.id) {
           return false;
         }
 
-        return todo;
+        return true;
       }),
     }));
   }
@@ -81,7 +87,7 @@ class App extends React.Component {
   showAllTodos = () => {
     this.setState(prevState => ({
       filteredTodosList: prevState.todosList,
-      filterState: 'all',
+      filterField: 'all',
     }));
   }
 
@@ -89,7 +95,7 @@ class App extends React.Component {
     this.setState(prevState => ({
       filteredTodosList:
         prevState.todosList.filter(todo => todo.completed === false),
-      filterState: 'active',
+      filterField: 'active',
     }));
   }
 
@@ -97,7 +103,7 @@ class App extends React.Component {
     this.setState(prevState => ({
       filteredTodosList:
         prevState.todosList.filter(todo => todo.completed === true),
-      filterState: 'completed',
+      filterField: 'completed',
     }));
   }
 
@@ -122,30 +128,42 @@ class App extends React.Component {
 
   render() {
     const {
-      todosList,
-      todo,
-      filteredTodosList,
-      filterState,
+      todosList, todo, filteredTodosList, filterField, currentIndex,
     } = this.state;
 
-    return (
+    if (todosList.length < 1) {
+      return (
+        <section className="todoapp">
+          <Header
+            todo={todo}
+            currentIndex={currentIndex}
+            handleChange={this.handleChange}
+            handleSubmit={this.handleSubmit}
+          />
+        </section>
+      );
+    }
 
+    return (
       <section className="todoapp">
         <Header
           todo={todo}
+          currentIndex={currentIndex}
           handleChange={this.handleChange}
           handleSubmit={this.handleSubmit}
         />
         <Todoslist
-          todosList={todosList}
           filteredTodosList={filteredTodosList}
           handleCheck={this.handleCheck}
-          handleDestroy={this.handleDestroy}
+          handleRemove={this.handleRemove}
           toggleCompleted={this.toggleCompleted}
+          showActiveTodos={this.showActiveTodos}
+          showCompletedTodos={this.showCompletedTodos}
+          filterField={filterField}
         />
         <Footer
           filteredTodosList={filteredTodosList}
-          filterState={filterState}
+          filterField={filterField}
           showActiveTodos={this.showActiveTodos}
           showAllTodos={this.showAllTodos}
           showCompletedTodos={this.showCompletedTodos}
