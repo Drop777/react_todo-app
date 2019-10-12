@@ -56,7 +56,7 @@ const Footer = ({
           ? 'block'
           : 'none',
       }}
-      onClick={deleteAllCompleted}
+      onClick={() => deleteAllCompleted(showTodos)}
     >
     Clear completed
     </button>

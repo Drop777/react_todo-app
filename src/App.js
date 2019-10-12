@@ -119,12 +119,13 @@ class App extends React.Component {
     }));
   }
 
-  deleteAllCompleted = () => {
+  deleteAllCompleted = (showTodos) => {
     this.setState(prevState => ({
       filteredTodosList:
         prevState.todosList.filter(todo => todo.completed === false),
       todosList: prevState.todosList.filter(todo => todo.completed === false),
     }));
+    showTodos('all');
   }
 
   render() {
