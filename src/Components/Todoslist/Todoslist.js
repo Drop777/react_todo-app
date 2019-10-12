@@ -9,8 +9,7 @@ const Todolist = ({
   handleRemove,
   toggleCompleted,
   filterField,
-  showActiveTodos,
-  showCompletedTodos,
+  showTodos,
 }) => (
   <section className="main" style={{ display: 'block' }}>
     <input
@@ -22,8 +21,17 @@ const Todolist = ({
     <label htmlFor="toggle-all">Mark all as complete</label>
     <ul className="todo-list">
       {filteredTodosList
-        // eslint-disable-next-line max-len
-        .map(todo => <Todoitem key={todo.id} todo={todo} handleCheck={handleCheck} handleRemove={handleRemove} filterField={filterField} showActiveTodos={showActiveTodos} showCompletedTodos={showCompletedTodos} />)}
+        .map(todo => (
+          <Todoitem
+            key={todo.id}
+            todo={todo}
+            handleCheck={handleCheck}
+            handleRemove={handleRemove}
+            filterField={filterField}
+            showTodos={showTodos}
+          />
+        ))
+      }
     </ul>
   </section>
 );

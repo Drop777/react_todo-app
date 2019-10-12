@@ -3,16 +3,15 @@ import classNames from 'classnames';
 import PropTypes from 'prop-types';
 
 const Footer = ({
+  todosList,
   filteredTodosList,
   filterField,
-  showActiveTodos,
-  showAllTodos,
-  showCompletedTodos,
+  showTodos,
   deleteAllCompleted,
 }) => (
   <footer className="footer" style={{ display: 'block' }}>
     <span className="todo-count">
-      {`${filteredTodosList.filter(todo => todo.completed === false)
+      {`${todosList.filter(todo => todo.completed === false)
         .length} `}
         items left
     </span>
@@ -22,7 +21,7 @@ const Footer = ({
         <a
           href="#/"
           className={classNames({ selected: filterField === 'all' })}
-          onClick={showAllTodos}
+          onClick={showTodos}
         >
         All
         </a>
@@ -32,7 +31,7 @@ const Footer = ({
         <a
           href="#/active"
           className={classNames({ selected: filterField === 'active' })}
-          onClick={showActiveTodos}
+          onClick={() => showTodos('active')}
         >
         Active
         </a>
@@ -42,7 +41,7 @@ const Footer = ({
         <a
           href="#/completed"
           className={classNames({ selected: filterField === 'completed' })}
-          onClick={showCompletedTodos}
+          onClick={() => showTodos('completed')}
         >
         Completed
         </a>

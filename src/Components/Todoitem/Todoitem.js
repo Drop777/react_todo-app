@@ -7,8 +7,7 @@ const Todoitem = ({
   handleCheck,
   handleRemove,
   filterField,
-  showActiveTodos,
-  showCompletedTodos,
+  showTodos,
 }) => (
   <li className={classNames({ completed: todo.completed })}>
     <div className="view">
@@ -18,7 +17,7 @@ const Todoitem = ({
         id={todo.id}
         checked={todo.completed}
         onChange={event => handleCheck(
-          event, todo, filterField, showActiveTodos, showCompletedTodos
+          event, todo, filterField, showTodos
         )}
       />
       <label htmlFor={todo.id}>{todo.todoTitle}</label>

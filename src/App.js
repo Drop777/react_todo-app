@@ -16,11 +16,12 @@ class App extends React.Component {
     const { value } = target;
 
     this.setState({
-      todo: value,
+      todo: value.trimLeft(),
     });
   }
 
-  handleSubmit = (todo, currentIndex) => {
+  handleSubmit = (todo, currentIndex, event) => {
+    event.preventDefault();
     if (todo) {
       const todoItem = {
         todoTitle: todo,
@@ -34,87 +35,87 @@ class App extends React.Component {
         currentIndex: prevState.currentIndex + 1,
         todosList: [...prevState.todosList, todoItem],
         filteredTodosList: [...prevState.todosList, todoItem],
+        filterField: 'all',
       }));
     }
   };
 
   handleCheck = (
-    { target }, todoItem, filterField, showActiveTodos, showCompletedTodos
+    { target },
+    todoItem,
+    filterField,
+    showTodos
   ) => {
+    function check(list, id, checked) {
+      return list.map((item) => {
+        if (item.id === id) {
+          return { ...item, completed: checked };
+        }
+
+        return item;
+      });
+    }
+
     this.setState(prevState => ({
-      todosList: prevState.todosList.map((todo) => {
-        if (todo.id === todoItem.id) {
-          return { ...todo, completed: target.checked };
-        }
-
-        return todo;
-      }),
-      filteredTodosList: prevState.filteredTodosList.map((todo) => {
-        if (todo.id === todoItem.id) {
-          return { ...todo, completed: target.checked };
-        }
-
-        return todo;
-      }),
+      todosList: check(prevState.todosList, todoItem.id, target.checked),
+      filteredTodosList:
+        check(prevState.filteredTodosList, todoItem.id, target.checked),
     }));
 
     if (filterField === 'active') {
-      showActiveTodos();
+      showTodos(filterField);
     } else if (filterField === 'completed') {
-      showCompletedTodos();
+      showTodos(filterField);
     }
   }
 
   handleRemove = (todoItem) => {
-    this.setState(prevState => ({
-      todosList: prevState.todosList.filter((todo) => {
-        if (todo.id === todoItem.id) {
+    function remove(list, id) {
+      return list.filter((item) => {
+        if (item.id === id) {
           return false;
         }
 
         return true;
-      }),
-      filteredTodosList: prevState.todosList.filter((todo) => {
-        if (todo.id === todoItem.id) {
-          return false;
-        }
+      });
+    }
 
-        return true;
-      }),
+    this.setState(prevState => ({
+      todosList: remove(prevState.todosList, todoItem.id),
+      filteredTodosList: remove(prevState.filteredTodosList, todoItem.id),
     }));
   }
 
-  showAllTodos = () => {
-    this.setState(prevState => ({
-      filteredTodosList: prevState.todosList,
-      filterField: 'all',
-    }));
-  }
-
-  showActiveTodos = () => {
-    this.setState(prevState => ({
-      filteredTodosList:
-        prevState.todosList.filter(todo => todo.completed === false),
-      filterField: 'active',
-    }));
-  }
-
-  showCompletedTodos = () => {
-    this.setState(prevState => ({
-      filteredTodosList:
-        prevState.todosList.filter(todo => todo.completed === true),
-      filterField: 'completed',
-    }));
+  showTodos = (filterType) => {
+    switch (filterType) {
+      case 'active':
+        return this.setState(prevState => ({
+          filteredTodosList:
+            prevState.todosList.filter(todo => todo.completed === false),
+          filterField: 'active',
+        }));
+      case 'completed':
+        return this.setState(prevState => ({
+          filteredTodosList:
+            prevState.todosList.filter(todo => todo.completed === true),
+          filterField: 'completed',
+        }));
+      default:
+        return this.setState(prevState => ({
+          filteredTodosList: prevState.todosList,
+          filterField: 'all',
+        }));
+    }
   }
 
   toggleCompleted = ({ target }) => {
+    function toggle(list, checked) {
+      return list.map(item => ({ ...item, completed: checked }));
+    }
+
     this.setState(prevState => ({
-      filteredTodosList:
-        prevState.filteredTodosList
-          .map(todo => ({ ...todo, completed: target.checked })),
-      todosList:
-        prevState.todosList
-          .map(todo => ({ ...todo, completed: target.checked })),
+      filteredTodosList: toggle(prevState.filteredTodosList, target.checked),
+      todosList: toggle(prevState.todosList, target.checked),
     }));
   }
 
@@ -155,18 +156,16 @@ class App extends React.Component {
         <Todoslist
           filteredTodosList={filteredTodosList}
           handleCheck={this.handleCheck}
+          showTodos={this.showTodos}
           handleRemove={this.handleRemove}
           toggleCompleted={this.toggleCompleted}
-          showActiveTodos={this.showActiveTodos}
-          showCompletedTodos={this.showCompletedTodos}
           filterField={filterField}
         />
         <Footer
+          todosList={todosList}
           filteredTodosList={filteredTodosList}
           filterField={filterField}
-          showActiveTodos={this.showActiveTodos}
-          showAllTodos={this.showAllTodos}
-          showCompletedTodos={this.showCompletedTodos}
+          showTodos={this.showTodos}
           deleteAllCompleted={this.deleteAllCompleted}
         />
       </section>
